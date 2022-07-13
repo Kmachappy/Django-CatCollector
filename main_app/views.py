@@ -1,7 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.http import HttpResponse
-from .models import Cat
+from .models import Cat, Feeding
+from .forms import FeedingForm
+
+
 # Faux cat data - database simulation
 # class Cat:
 #     def __init__(self, name, breed, description, age):
@@ -35,11 +38,36 @@ def cats_index(request):
     cats = Cat.objects.all()
     return render(request, 'cats/index.html', {'cats':cats})
 
+def feeding_create(request, cat_id):
+    # print(request.POST)
+    # create the ModelForm instance using the data in request.POST
+    form = FeedingForm(request.POST)
+    # print(form)
+    # validate the data
+    if form.is_valid():
+        # don't save the form to the db just yet
+        new_feeding = form.save(commit=False)
+        print('this is new_feeding',new_feeding)
+        # set the cat
+        new_feeding.cat_id = cat_id
+        # save the form
+        new_feeding.save()
+    # redirect to the detail view
+    return redirect('detail', cat_id=cat_id)
+
+
 def cats_detail(request, cat_id):
     # get the individual cat
     cat = Cat.objects.get(id=cat_id)
+    # instantiate the feeding form
+    feeding_form = FeedingForm()
+    # get the feedings for this cat
+    feedings = Feeding.objects.filter(cat_id=cat_id)
+    # render the template
+    return render(request, 'cats/detail.html', {'cat':cat, 'feeding_form':feeding_form, 'feedings':feedings})
+
     #  render template, pass it the cat
-    return render(request, 'cats/detail.html', {'cat':cat})
+    # return render(request, 'cats/detail.html', {'cat':cat})
 
 class CatCreate(CreateView):
     model = Cat
