@@ -20,7 +20,7 @@ from .models import Cat
 #     Cat('Sasuke', 'black california tabbi mix', 'best cat ever i miss her', 2),
 # ]
 
-
+print("this si update", UpdateView)
 
 # Create your views here.
 def home(request):
@@ -48,6 +48,7 @@ class CatCreate(CreateView):
     # fields = ['name', 'breed','description','age']
 
 class CatUpdate(UpdateView):
+    
     model = Cat
     # let's disallow the renaming of a cat by excluding the name field!
     fields = ['breed','description', 'age']
